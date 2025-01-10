@@ -3,10 +3,12 @@ import mortgage as mt
 
 st.title("Mortgage Calculator")
 
+st.write("Something about this application....")
+
 # calculate monthly repayment
 # st.subheader("I want to calculate monthly repayments")
 
-with st.expander("I want to calculate monthly repayments", expanded=False):
+with st.expander("How much will my monthly repayments be?", expanded=False):
 
     col1, col2 = st.columns([0.65, 0.35], gap="medium")
 
@@ -35,7 +37,7 @@ with st.expander("I want to calculate monthly repayments", expanded=False):
         st.metric("Total interest", f"£{interest_paid:,}", border=True)
 
 # calcualte max value
-with st.expander("I want to get the maximum property value I can afford", expanded=False):
+with st.expander("What value of property can I afford?", expanded=False):
 
     col1, col2 = st.columns([0.65, 0.35], gap="medium")
 
@@ -61,4 +63,31 @@ with st.expander("I want to get the maximum property value I can afford", expand
         interest_paid = round(mortgage2.calc_interest_paid(term * 12))
         st.metric("Total interest", f"£{interest_paid:,}", border=True)
 
+# calculate time to save
+with st.expander("How long will I have to save?"):
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        val_target = st.slider("Target property value", value=300000, step=10000, min_value=80000, max_value=1000000, key="tarval_value")
+        target_dep = st.number_input("Deposit %", value=10, min_value=5, max_value=50, step=5, key="tarval_deposit")
+        # convert to multiplier
+        target_dep /= 100
+
+        growth = st.slider("House price growth", value=2.5, min_value=0.1, max_value=15.0, step=0.01, key="tarval_price_growth")
+        # convert to multiplier
+        growth /= 100
+
+    with col2:
+        saving_per_month = st.slider("Saving amount per month", value=200, min_value=20, max_value=1000, step=10, key="tarval_saving_amount")
+        saving_annual_rate = st.number_input("Annual savings interest rate", value=3.5, min_value=0.1, max_value=8.0, step=0.1, key="tarval_saving_rate")
+
+    # present target deposit value
+    target_deposit_value = round(target_dep * val_target)
+    st.write(f"Target deposit value: £{target_deposit_value:,}")
+
+    # initialise mortgage: value, target deposit, (rate - ignore), (term - ignore)
+    mortgage3 = mt.Mortgage(val_target, val_target * target_dep, 0.045, 25)
+
+    # initialise savings: monthly saving amount, savings rate
 
