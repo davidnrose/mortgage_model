@@ -21,7 +21,7 @@ with st.expander("How much will my monthly repayments be?", expanded=False):
 
         col3, col4 = st.columns(2)
         with col3:
-            deposit = st.number_input("Deposit %", value=10, min_value=5, max_value=50, step=5)
+            deposit = st.number_input("Deposit %", value=10, min_value=0, max_value=50, step=5)
             deposit /= 100
         with col4:
             term = st.number_input("Term length in Years", value=25, min_value=5, max_value=50, step=5)
@@ -80,34 +80,44 @@ with st.expander("How long will I have to save?"):
         growth /= 100
 
     with col2:
+        already_saved = st.number_input("Amount already saved", min_value=0, max_value=100000, step=100, value=500, key="tarval_saving_amount_prior")
         saving_per_month = st.slider("Saving amount per month", value=200, min_value=20, max_value=1000, step=10, key="tarval_saving_amount")
-        saving_annual_rate = st.number_input("Annual savings interest rate", value=3.5, min_value=0.1, max_value=8.0, step=0.1, key="tarval_saving_rate")
+        saving_annual_rate = st.slider("Annual savings interest rate", value=3.5, min_value=0.1, max_value=8.0, step=0.1, key="tarval_saving_rate")
         # convert to multiplier
         saving_annual_rate /= 100
 
     # present target deposit value
     target_deposit_value = round(target_dep * val_target)
-    st.write(f"Target deposit value: £{target_deposit_value:,}")
 
     # initialise mortgage: value, target deposit, (rate - ignore), (term - ignore)
     mortgage3 = mt.Mortgage(val_target, val_target * target_dep, 0.045, 25)
 
-    st.write(f"Growth: {growth}")
-
     # initialise savings: monthly saving amount, savings rate
-    months = mt.saving(mortgage3, saving_per_month, saving_annual_rate, house_price_growth=growth, deposit_perc=target_dep)
-
-    st.write(target_dep)
+    months, exceeded = mt.saving(mortgage3, saving_per_month, saving_annual_rate, house_price_growth=growth, deposit_perc=target_dep, saved=already_saved, deposit=target_deposit_value)
 
     years = floor(months/12)
     months_remainder = months % 12
 
+    # format the text to return
     if years == 1:
-        metric_saving_title = f"{years} year and {months_remainder} months"
+        years_text = "year"
     else:
-        metric_saving_title = f"{years} years and {months_remainder} months"
+        years_text = "years"
+    if months_remainder ==1:
+        months_text = "month"
+    else: months_text = "months"
 
-    # st.metric("Time to save for goal deposit", metric_saving_title, border=True)
+    if exceeded:
+        over_text = "Over "
+    else:
+        over_text = ""
 
-    st.metric("Deposit", months)
+    # compile the text
+    metric_saving_result_text = f"{over_text} {years} {years_text} and {months_remainder} {months_text}"
+    # display target deposit and time to save
+    col3, col4 = st.columns([.3,.7])
 
+    with col3:
+        st.metric("Target deposit value", f"£{target_deposit_value:,}",border=True)
+    with col4:
+        st.metric("Time to save for goal deposit", metric_saving_result_text, border=True)

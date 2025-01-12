@@ -184,19 +184,24 @@ def project_growth(value, ann_growth, years):
 # calculate time to save for a mortgage under conditions specified
 def saving(mortgage, month_saving, savings_rate, house_price_growth=0.02, months=1, saved=0, deposit=0, deposit_perc=0.1):
     deposit_amount = list()
-    annual_growth = house_price_growth
-    if saved > deposit:
-        return deposit
+    if saved > deposit and months < 950:
+        exceeded = False
+        return months, exceeded
+
+    if saved < deposit and months >= 950:
+        exceeded = True
+        return months, exceeded
+
+
 
     else:
         saved += month_saving
         interest = saved * (savings_rate / 12)
         saved += interest
 
-        house_value = mortgage.project_sale_price(annual_growth=annual_growth, years_held=months/12)
+        house_value = mortgage.project_sale_price(annual_growth=house_price_growth, years_held=months/12)
         deposit = house_value * deposit_perc
-        print(deposit)
         deposit_amount.append(deposit)
 
         months += 1
-        return saving(mortgage, month_saving=month_saving, savings_rate=savings_rate, months=months, saved=saved, deposit=deposit)
+        return saving(mortgage, month_saving=month_saving, savings_rate=savings_rate, months=months, saved=saved, deposit=deposit, house_price_growth=house_price_growth)
