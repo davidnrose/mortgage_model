@@ -1,10 +1,20 @@
+
 import streamlit as st
 import mortgage as mt
 from math import floor
 
+# title and image
 st.title("Mortgage Calculator")
+st.image("scott-webb-1ddol8rgUH8-unsplash.jpg")
 
-st.write("Something about this application....")
+# introduction
+st.write("I designed this calculator to help you work out some important mortgage questions: ")
+st.write("1. Based on the cost of a house, how much will your monthly repayments be?")
+st.write("2. Based on how much you can afford to pay each month, what is the maximum house value?")
+st.write("3. Given a certain savings rate, how long will it take you to save for a deposit?")
+st.divider()
+st.write("Remember: the results you get from this calculator don't indicate that mortgage providers will lend to you in those circumstances. The purpose of the calculator is to better understand how different factors (deposit, interest rate) change the total total and the amount of interest you pay. If you're looking to apply for a mortgage, you should check what's available in the market, rather than what is mathematically possible.")
+st.divider()
 
 # calculate monthly repayment
 # st.subheader("I want to calculate monthly repayments")
