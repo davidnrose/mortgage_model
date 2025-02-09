@@ -105,10 +105,9 @@ class Mortgage:
 
         return round(total_int_paid, 2)
 
-    def calc_capital_paid(self, months):
-        total_cap_paid = 0
-        capital_remaining = self.principal - self.deposit
-        repayment = self.repayment
+    def calc_capital_paid(self, months, capital_paid=0):
+        total_cap_paid = capital_paid
+        capital_remaining = self.principal - self.deposit - total_cap_paid
         for i in range(months):
             int_paid = (capital_remaining * self.rate) / 12
             cap_paid = self.repayment - int_paid
@@ -117,6 +116,17 @@ class Mortgage:
             total_cap_paid += cap_paid
 
         return round(total_cap_paid, 2)
+
+    def calc_balance(self, months, principal_paid=0):
+        ''' calculate the outstanding balance on the mortgage after x months'''
+        outstanding = self.principal - principal_paid
+
+        for m in range(months):
+            int_paid = (outstanding * self.rate) / 12
+            cap_paid = self.repayment - int_paid
+            outstanding -= cap_paid
+
+        return round(outstanding, 2)
 
     def rental_profit(self, months, rent, tax_rate=0.4, management=0.07):  # assume estate agent management fee of 7%
         total_income = months * rent
